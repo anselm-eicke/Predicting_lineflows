@@ -1,4 +1,4 @@
-# Load libraries
+# libraries
 library(foreign)
 library(lubridate)
 library(caret)
@@ -9,32 +9,30 @@ library(earth)
 library(plyr)  
 library(openxlsx)
 
-source("1 - Files/methods.r")
-source("1 - Files/functions.r")
+source("functions.R")
 
 input_file <- "Input.csv"
 size=500
 output_file <- "Output.csv"
+set.seed(123) 
 
-# read network raw data
 # read_raw_data()
 
+# load configuration data from input file
 input_data = read_case_data(size, input_file)
 
+# get input data and convert formats
 covariates = input_data$covariates
-covariates[,-1] = sapply(input_data$covariates[,-1] ,as.numeric)
-
+covariates[,-1] = sapply(input_data$covariates[,-1], as.numeric)
 lines = input_data$lines
-lines[,-1] = sapply(input_data$lines[,-1] ,as.numeric)
-
+lines[,-1] = sapply(input_data$lines[,-1], as.numeric)
 t_lines = input_data$t_lines
-
 methods = input_data$methods
 
-set.seed(123)  
+# create empty dataframe 
 results = data.frame(row.names = t_lines)
 
-for (line in c(t_lines)){ # 
+for (line in c(t_lines)){ # prepare data and run models
     
     #add lagged line if not included in covariates and delete NAs
     covariates_l <- covariates
