@@ -1,4 +1,23 @@
-# libraries
+# INITIALIZATION
+
+# number of hours in model run
+size=500 
+
+t_lines = list('203')
+methods = list('') 
+
+# MARS
+# Linear regression
+# Random forest
+# kNN
+# Support vector regression
+
+input_file <- "Input.csv"
+output_file <- "Output.csv"
+
+#----------------------------------------------------------
+
+# LIBRARIES
 library(foreign)
 library(lubridate)
 library(caret)
@@ -11,9 +30,11 @@ library(openxlsx)
 
 source("functions.R")
 
-input_file <- "Input.csv"
-size=500
-output_file <- "Output.csv"
+
+#-----------------------------------
+
+# PREPROCESSING
+
 set.seed(123) 
 
 # read_raw_data()
@@ -26,13 +47,17 @@ covariates = input_data$covariates
 covariates[,-1] = sapply(input_data$covariates[,-1], as.numeric)
 lines = input_data$lines
 lines[,-1] = sapply(input_data$lines[,-1], as.numeric)
-t_lines = input_data$t_lines
-methods = input_data$methods
+#t_lines = input_data$t_lines
+#methods = input_data$methods
 
 # create empty dataframe 
 results = data.frame(row.names = t_lines)
 
-for (line in c(t_lines)){ # prepare data and run models
+# --------------------------------------------------
+
+# PREPARE DATA AND RUN MODELS
+
+for (line in c(t_lines)){ 
     
     #add lagged line if not included in covariates and delete NAs
     covariates_l <- covariates
@@ -69,6 +94,11 @@ for (line in c(t_lines)){ # prepare data and run models
         }
     }
 }
+
+
+# ---------------------------------------
+
+# OUTPUT PROCESSING
 
 input <- read.csv(input_file, fileEncoding="UTF-8-BOM")
 
