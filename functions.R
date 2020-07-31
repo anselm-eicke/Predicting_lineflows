@@ -1,5 +1,10 @@
+library(plyr)
+
 # Preprocessing
-read_raw_data <- function(){
+
+#--------------------------
+# preprocessline data
+preprocess_line_data <- function(){
   
   start = 2016
   end <- 2020
@@ -7,7 +12,7 @@ read_raw_data <- function(){
   out = data.frame()
   for (year in (start:end)){
     for (semester in (1:2)){
-      file = paste('2 - Data/Netzlast_', year, '_', semester, '.csv', sep = "", collapse = NULL)
+      file = paste('Data/Netzlast_', year, '_', semester, '.csv', sep = "", collapse = NULL)
       print(file)
       print(file.exists(file))
       if (!file.exists(file)){next}
@@ -22,7 +27,8 @@ read_raw_data <- function(){
       }     
     }       
   }
-  write.csv(out, "2 - Data/Networkload_0.csv")
+  # for testing purposes
+  # write.csv(out, "Data/Networkload_0.csv")
   
   
   new_names <- gsub("Leitung.Nr..", "Line.", colnames(out))
@@ -30,7 +36,8 @@ read_raw_data <- function(){
   
   names(out)<- new_names
   
-  write.csv(out, "2 - Data/Networkload_1.csv")
+  # for testing purposes
+  #write.csv(out, "Data/Networkload_1.csv")
   
   for (c in col(out[1,])){
     for (r in (1:nrow(out))){
@@ -40,7 +47,30 @@ read_raw_data <- function(){
     }
   }
   
-  write.csv(out, "2 - Data/Lineload.csv")
+  write.csv(out, "Data/Lineload.csv")
+}
+
+
+read_covariates <- function(){
+  raw <- read.csv(file = 'Data/Raw Data/Forecasted_generation.csv', fileEncoding="UTF-8-BOM")
+  
+  raw$Datetime <- paste(raw$Datum, raw$Uhrzeit)
+  raw$Datetime <- as.POSIXct(raw$Datetime, format = "%d.%m.%Y %H:%M")
+  
+  raw$Datetime2 <- trunc(raw$Datetime, units = "hours")
+  
+  newdata <- cast(md, formula, FUN)
+  aggregated_data <- cast(raw, by = list(raw$Gesamt.MWh.), 
+                               FUN=sum) 
+}
+  
+library(dplyr)
+library(lubridate)
+  raw %>% group_by(hour=raw$Datetime2)  %>% summarize(Gesamt.MWh.=sum(Gesamt.MWh.))
+
+  aggregated_data <- aggregate(raw, 
+                               by = list(raw$Datetime2), 
+                               FUN=mean) 
 }
 
 read_case_data <- function(size, input_file){
@@ -102,7 +132,11 @@ read_case_data <- function(size, input_file){
   return(results)
 }
 
+
+#---------------------------------------------
+
 # Models
+
 mars <- function(line, trainingData, testData){
   
   #Build MARS model
@@ -192,6 +226,7 @@ SVR <- function(line, trainingData, testData){
   results = rmse(Pred, testData[ ,line])
   return(results)
 }
+
 
 #Determining lagged values (default is 24h time lag)
 lagged <- function(df, lag=24){

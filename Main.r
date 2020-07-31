@@ -29,29 +29,32 @@ library(plyr)
 library(openxlsx)
 
 source("functions.R")
-
+source("Preprocessing.R")
 
 #-----------------------------------
 
 # PREPROCESSING
+#Preprocessing()
 
 set.seed(123) 
 
-# read_raw_data()
+
 
 # load configuration data from input file
-input_data = read_case_data(size, input_file)
+input_data <- read_case_data(size, input_file)
 
 # get input data and convert formats
-covariates = input_data$covariates
-covariates[,-1] = sapply(input_data$covariates[,-1], as.numeric)
-lines = input_data$lines
-lines[,-1] = sapply(input_data$lines[,-1], as.numeric)
+covariates <- input_data$covariates
+covariates[,-1] <- sapply(input_data$covariates[,-1], as.numeric)
+lines <- input_data$lines
+lines[,-1] <- sapply(input_data$lines[,-1], as.numeric)
 #t_lines = input_data$t_lines
 #methods = input_data$methods
 
 # create empty dataframe 
-results = data.frame(row.names = t_lines)
+results <- data.frame(row.names = t_lines)
+
+covariate_data <- read.csv("Data/Covariates.csv")
 
 # --------------------------------------------------
 
